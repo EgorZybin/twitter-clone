@@ -1,0 +1,67 @@
+services:
+  nginx:
+    build:
+      context: ../../Desktop/python_advanced_diploma
+      dockerfile: nginx/Dockerfile
+    ports:
+      - "80:80"
+    depends_on:
+      - fastapi_app
+    networks:
+      - my_network
+
+  fastapi_app:
+    build:
+      context: ../../Desktop/python_advanced_diploma
+      dockerfile: api/Dockerfile
+    ports:
+      - "8000:8000"
+    depends_on:
+      postgres:
+        condition: service_healthy
+        restart: true
+    networks:
+      - my_network
+
+  postgres:
+    image: postgres:latest
+    environment:
+      - POSTGRES_USER=postgres
+      - POSTGRES_PASSWORD=admin
+      - POSTGRES_DB=twitter
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -d twitter -U postgres"]
+      interval: 30s
+      timeout: 60s
+      retries: 5
+      start_period: 80s
+    ports:
+      - "5432:5432"
+    networks:
+      - my_network
+    volumes:
+      - ./data:/var/lib/postgresql/data
+  prometheus:
+    image: prom/prometheus
+    platform: linux/arm64/v8
+    volumes:
+      - ./prometheus/config.yml:/etc/prometheus/prometheus.yml
+    ports:
+      - 9090:9090
+    depends_on:
+      - fastapi_app
+    networks:
+      - my_network
+  grafana:
+    image: grafana/grafana
+    platform: linux/arm64/v8
+    ports:
+      - 3000:3000
+    depends_on:
+      - fastapi_app
+      - prometheus
+    networks:
+      - my_network
+networks:
+  my_network:
+    driver: bridge
