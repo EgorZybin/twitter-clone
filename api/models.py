@@ -3,11 +3,11 @@ from typing import Generator
 from sqlalchemy import Column, Integer, String, create_engine, ForeignKey, Table
 from sqlalchemy.orm import sessionmaker, declarative_base, relationship
 
-DATABASE_URL_TEST = (
-    "postgresql+psycopg2://test_user:test_password@localhost/test_twitter"
+DATABASE_URL = (
+    "postgresql+psycopg2://postgres:admin@postgres:5432/twitter"
 )
-engine_test = create_engine(DATABASE_URL_TEST)
-Session = sessionmaker(bind=engine_test)
+engine = create_engine(DATABASE_URL)
+Session = sessionmaker(bind=engine)
 
 Base = declarative_base()
 
