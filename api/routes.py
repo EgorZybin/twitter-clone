@@ -31,7 +31,7 @@ sentry_sdk.init(
     # We recommend adjusting this value in production.
     profiles_sample_rate=1.0,
 )
-
+create_database_tables()
 
 @app.get("/api/uploadfile/{file_name}")
 async def get_file_from_dir(file_name: str):
@@ -232,5 +232,4 @@ def delete_user(id: int, session=Depends(get_session)):
 
 
 if __name__ == "__main__":
-    create_database_tables()
     uvicorn.run(app)
